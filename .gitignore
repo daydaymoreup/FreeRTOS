@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+OBJ/
+.gitignore
+USER/DebugConfig
+USER/RTOS.uvguix.Robert
+USER/RTOS.uvoptx
+USER/JLinkSettings.ini
