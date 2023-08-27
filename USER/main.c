@@ -2,6 +2,7 @@
 #include "delay.h"
 #include "usart.h"
 #include "led.h"
+#include "timer.h"
 #include "FreeRTOS.h"
 #include "task.h"
 /************************************************
@@ -15,31 +16,22 @@
 ************************************************/
 
 //任务优先级
-#define START_TASK_PRIO		1
+#define START_TASK_PRIO		1             //大于configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY中断优先级5
 //任务堆栈大小	
-#define START_STK_SIZE 		128  
+#define START_STK_SIZE 		256  
 //任务句柄
 TaskHandle_t StartTask_Handler;
 //任务函数
 void start_task(void *pvParameters);
 
 //任务优先级
-#define LED0_TASK_PRIO		2
+#define INTERRUPT_TASK_PRIO		2
 //任务堆栈大小	
-#define LED0_STK_SIZE 		50  
+#define INTERRUPT_STK_SIZE 		256  
 //任务句柄
-TaskHandle_t LED0Task_Handler;
+TaskHandle_t INTERRUPTTask_Handler;
 //任务函数
-void led0_task(void *pvParameters);
-
-//任务优先级
-#define LED1_TASK_PRIO		3
-//任务堆栈大小	
-#define LED1_STK_SIZE 		50  
-//任务句柄
-TaskHandle_t LED1Task_Handler;
-//任务函数
-void led1_task(void *pvParameters);
+void interrupt_task(void *pvParameters);
 
 int main(void)
 {
@@ -47,7 +39,8 @@ int main(void)
 	delay_init();	    				//延时函数初始化	  
 	uart_init(115200);					//初始化串口
 	LED_Init();		  					//初始化LED
-	 
+	TIM3_Int_Init( 10000-1, 7200-1);
+    TIM5_Int_Init( 10000-1, 7200-1);
 	//创建开始任务
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
                 (const char*    )"start_task",          //任务名称
@@ -63,44 +56,33 @@ void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();           //进入临界区
     //创建LED0任务
-    xTaskCreate((TaskFunction_t )led0_task,     	
-                (const char*    )"led0_task",   	
-                (uint16_t       )LED0_STK_SIZE, 
+    xTaskCreate((TaskFunction_t )interrupt_task,     	
+                (const char*    )"interrupt_task",   	
+                (uint16_t       )INTERRUPT_STK_SIZE, 
                 (void*          )NULL,				
-                (UBaseType_t    )LED0_TASK_PRIO,	
-                (TaskHandle_t*  )&LED0Task_Handler);   
-    //创建LED1任务
-    xTaskCreate((TaskFunction_t )led1_task,     
-                (const char*    )"led1_task",   
-                (uint16_t       )LED1_STK_SIZE, 
-                (void*          )NULL,
-                (UBaseType_t    )LED1_TASK_PRIO,
-                (TaskHandle_t*  )&LED1Task_Handler);         
+                (UBaseType_t    )INTERRUPT_TASK_PRIO,	
+                (TaskHandle_t*  )&INTERRUPTTask_Handler);       
     vTaskDelete(StartTask_Handler); //删除开始任务
     taskEXIT_CRITICAL();            //退出临界区
 }
 
 //LED0任务函数 
-void led0_task(void *pvParameters)
+void interrupt_task(void *pvParameters)
 {
+    static u32 sum = 0;
     while(1)
     {
-        printf("111");
+        sum++;
+        if( 5 == sum )
+        {
+            printf("close system interrupt !\r\n");
+            portDISABLE_INTERRUPTS();
+            delay_xms( 5000 );
+            printf("open system interrupt !\r\n");
+            portENABLE_INTERRUPTS();
+        }
         LED0=~LED0;
-        vTaskDelay(500);
+        vTaskDelay(1000);
     }
 }   
 
-//LED1任务函数
-void led1_task(void *pvParameters)
-{
-    while(1)
-    {
-    
-        printf("222");
-        LED1=0;
-        vTaskDelay(200);
-        LED1=1;
-        vTaskDelay(800);
-    }
-}

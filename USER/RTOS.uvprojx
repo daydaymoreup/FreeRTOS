@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM3;..\HARDWARE\TIMER</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,6 +409,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\LED\led.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\TIMER\timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -443,6 +448,11 @@
               <FileName>startup_stm32f10x_hd.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\CORE\startup_stm32f10x_hd.s</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_tim.c</FilePath>
             </File>
           </Files>
         </Group>
